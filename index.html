@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>公益財団法人データビューア</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>公益財団法人データビューア</h1>
+    <p class="subtitle">公開データを可視化するサンプルUI</p>
+  </header>
+
+  <section id="summary" class="card">
+    <h2>サマリ</h2>
+    <div class="stats-grid">
+      <div class="stat">
+        <span class="stat-value" id="stat-total">-</span>
+        <span class="stat-label">登録法人数</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value" id="stat-financials">-</span>
+        <span class="stat-label">財務データあり</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value" id="stat-flagged">-</span>
+        <span class="stat-label">フラグ検出</span>
+      </div>
+      <div class="stat critical">
+        <span class="stat-value" id="stat-critical">-</span>
+        <span class="stat-label">最優先ターゲット</span>
+      </div>
+    </div>
+    <p id="generated-at" class="meta"></p>
+  </section>
+
+  <section id="filters" class="card">
+    <h2>フィルタ</h2>
+    <div class="filter-row">
+      <div class="filter-group">
+        <label for="filter-pref">都道府県</label>
+        <select id="filter-pref"><option value="">全て</option></select>
+      </div>
+      <div class="filter-group">
+        <label for="filter-grant-type">事業形態</label>
+        <select id="filter-grant-type"><option value="">全て</option></select>
+      </div>
+      <div class="filter-group">
+        <label for="filter-grant-field">事業分野</label>
+        <select id="filter-grant-field"><option value="">全て</option></select>
+      </div>
+      <div class="filter-group">
+        <label for="filter-flag">フラグ</label>
+        <select id="filter-flag">
+          <option value="">全て</option>
+          <option value="any">フラグあり</option>
+          <option value="critical">Critical のみ</option>
+          <option value="high">High 以上</option>
+          <option value="rapid_revenue_growth">収益急増</option>
+          <option value="rapid_securities_growth">有価証券急増</option>
+          <option value="high_securities_ratio">有価証券比率高</option>
+          <option value="large_surplus">大幅黒字</option>
+          <option value="growing_surplus_trend">連続黒字拡大</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label for="filter-search">検索</label>
+        <input type="text" id="filter-search" placeholder="法人名で検索...">
+      </div>
+    </div>
+    <div class="filter-row">
+      <div class="filter-group">
+        <label for="filter-min-revenue">最低収益（百万円）</label>
+        <input type="number" id="filter-min-revenue" placeholder="0">
+      </div>
+      <div class="filter-group">
+        <label for="filter-min-sec-pct">最低有価証券比率（%）</label>
+        <input type="number" id="filter-min-sec-pct" placeholder="0">
+      </div>
+      <div class="filter-group">
+        <label for="sort-by">ソート</label>
+        <select id="sort-by">
+          <option value="securities_desc">有価証券運用益 ↓</option>
+          <option value="revenue_desc">総収益 ↓</option>
+          <option value="surplus_desc">黒字率 ↓</option>
+          <option value="sec_pct_desc">有価証券比率 ↓</option>
+          <option value="flags_desc">フラグ数 ↓</option>
+          <option value="name_asc">法人名 ↑</option>
+          <option value="pref_asc">都道府県 ↑</option>
+        </select>
+      </div>
+      <button id="btn-reset" class="btn">リセット</button>
+      <button id="btn-export-csv" class="btn btn-primary">CSV出力</button>
+    </div>
+  </section>
+
+  <section id="results" class="card">
+    <h2>一覧 (<span id="result-count">0</span>件)</h2>
+    <div class="table-wrap">
+      <table id="foundation-table">
+        <thead>
+          <tr>
+            <th>都道府県</th>
+            <th>法人名</th>
+            <th>直近年度</th>
+            <th class="num">総収益<br>(百万円)</th>
+            <th class="num">有価証券<br>運用益<br>(百万円)</th>
+            <th class="num">有価証券<br>比率(%)</th>
+            <th class="num">当期黒字<br>(百万円)</th>
+            <th class="num">黒字率<br>(%)</th>
+            <th>フラグ</th>
+            <th>助成種別</th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="footnotes" class="card">
+    <h2>指標の定義と計算式</h2>
+    <div class="footnote-grid">
+
+      <div class="footnote-item">
+        <h4>総収益（百万円）</h4>
+        <p class="formula">= 経常収益合計</p>
+        <p class="desc">その年度に認識した全ての経常的な収入。受取寄付金・補助金・事業収益・投資収益（配当・売却益・利息等）・不動産賃貸収入などの合計。公益法人会計基準上の「経常収益」に対応。</p>
+      </div>
+
+      <div class="footnote-item">
+        <h4>有価証券運用益（百万円）</h4>
+        <p class="formula">= 受取配当金 + 有価証券売却益 + その他有価証券運用収入</p>
+        <p class="desc">株式・債券・投資信託等の保有・売却から生じた収益。<strong>株価上昇局面で大幅に増加する傾向があり、co-funding営業の最重要指標</strong>。財団によって「運用収益」「配当収入」等と表記が異なる場合がある。</p>
+      </div>
+
+      <div class="footnote-item">
+        <h4>有価証券比率（%）</h4>
+        <p class="formula">= 有価証券運用益 ÷ 総収益 × 100</p>
+        <p class="desc">総収益のうち株式等の運用益が占める割合。<strong>40%以上で「高」フラグ。60%以上は事実上、株式運用が財団の主要財源</strong>を意味し、株価動向への依存度が高い。co-funding提案時は「運用益が助成事業を支えている」論点で訴求できる。</p>
+      </div>
+
+      <div class="footnote-item">
+        <h4>当期黒字（百万円）</h4>
+        <p class="formula">= 経常収益合計 − 経常費用合計（± 経常外損益）</p>
+        <p class="desc">公益法人会計上の「当期一般正味財産増減額」に相当。プラスの場合は収益超過（黒字）、マイナスは費用超過（赤字）を意味する。<strong>2025年4月施行の改正法では「中期的収支均衡」が求められ、大幅な黒字が継続する財団は公益目的事業費の増大（＝助成拡大）を迫られる</strong>。</p>
+      </div>
+
+      <div class="footnote-item">
+        <h4>黒字率（%）</h4>
+        <p class="formula">= 当期黒字 ÷ 総収益 × 100</p>
+        <p class="desc">収益に対する黒字の割合。<strong>20%以上で「大幅黒字」フラグ</strong>。この数値が高いほど、財団が「使い切れていない収益」を抱えており、共同助成（co-funding）提案の受け入れ余地が大きい。</p>
+      </div>
+
+      <div class="footnote-item">
+        <h4>フラグの種類と閾値</h4>
+        <p class="formula"></p>
+        <table class="flag-def-table">
+          <thead><tr><th>フラグ</th><th>重要度</th><th>定義・計算式</th></tr></thead>
+          <tbody>
+            <tr><td><span class="flag-badge flag-normal">収益急増</span></td><td>Normal〜Critical</td><td>前年比収益増加率 ≥ 30%（Critical: ≥ 60%）</td></tr>
+            <tr><td><span class="flag-badge flag-normal">証券急増</span></td><td>Normal〜Critical</td><td>有価証券運用益の前年比増加率 ≥ 50%（Critical: ≥ 100%）</td></tr>
+            <tr><td><span class="flag-badge flag-normal">証券比率高</span></td><td>Normal〜Critical</td><td>有価証券比率 ≥ 40%（Critical: ≥ 80%）</td></tr>
+            <tr><td><span class="flag-badge flag-normal">大幅黒字</span></td><td>Normal〜Critical</td><td>黒字率 ≥ 20%（Critical: ≥ 40%）</td></tr>
+            <tr><td><span class="flag-badge flag-normal">連続黒字増</span></td><td>High固定</td><td>3年連続で当期黒字が前年を上回る</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="footnote-item">
+        <h4>法的根拠（2025年4月改正後）</h4>
+        <p class="formula">公益社団法人及び公益財団法人の認定等に関する法律</p>
+        <p class="desc">
+          <strong>旧制度（〜2025年3月）</strong>：第14条「収支相償の原則」— 公益目的事業の収入は適正費用を超えてはならない。単年度での使い切りが実質的に求められていた。<br><br>
+          <strong>新制度（2025年4月〜）</strong>：「中期的収支均衡」に移行。概ね5年間の中期で均衡を求める緩和措置。ただし有価証券運用益が急増している財団は、大幅な累積黒字を解消するために助成規模の拡大が必要であり、co-funding提案の好機が継続する。
+        </p>
+      </div>
+
+      <div class="footnote-item">
+        <h4>データ品質・出典について</h4>
+        <p class="formula"></p>
+        <p class="desc">
+          財務データは公益法人informationに公開された事業報告等（活動計算書・正味財産増減計算書・貸借対照表）に基づく。<code>data_quality: auto</code> は機械的取得、<code>manual_verified</code> は人手で確認済みであることを示す。数値は百万円単位で四捨五入。
+          サンプルデータは公開情報に基づく概算値であり、営業判断の際は必ず一次資料（<a href="https://www.koeki-info.go.jp/" target="_blank">公益法人information</a>）で確認すること。
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="detail-modal" class="modal hidden">
+    <div class="modal-content">
+      <button class="modal-close" id="modal-close">&times;</button>
+      <div id="modal-body"></div>
+    </div>
+  </section>
+
+  <footer>
+    <p>データソース: <a href="https://www.koeki-info.go.jp/" target="_blank">公益法人information</a> |
+    分類体系: <a href="https://www.jfc.or.jp/" target="_blank">助成財団センター</a> |
+    法的根拠: 公益認定法 第5条第6号・第14条（旧収支相償）→ 2025年4月〜中期的収支均衡</p>
+  </footer>
+
+  <script src="app.js?v=20260329005418"></script>
+</body>
+</html>
