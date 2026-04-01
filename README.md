@@ -28,3 +28,10 @@ python -m http.server 8787
 ## GitHub Pages
 
 このディレクトリをリポジトリルートとして公開すれば、そのままGitHub Pagesで配信できます。
+
+## インデックス抑止
+
+- `index.html` に `robots` / `googlebot` の `noindex` メタタグを設定
+- `robots.txt` で全クローラーに `Disallow: /` を設定
+
+注: 検索エンジン側の反映には時間差があり、過去に取得済みURLは即時には消えない場合があります。
