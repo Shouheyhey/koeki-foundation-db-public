@@ -1,0 +1,252 @@
+/* 公益財団法人 Co-Funding ターゲットDB */
+
+:root {
+  --bg: #f5f6fa;
+  --card: #fff;
+  --border: #e1e4e8;
+  --text: #24292e;
+  --text-secondary: #586069;
+  --primary: #0366d6;
+  --primary-dark: #0250a3;
+  --danger: #d73a49;
+  --warning: #e36209;
+  --success: #28a745;
+  --critical-bg: #ffeef0;
+  --high-bg: #fff8e1;
+  --normal-bg: #e8f5e9;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  padding: 1rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+header {
+  text-align: center;
+  padding: 1.5rem 0 1rem;
+}
+header h1 { font-size: 1.5rem; font-weight: 700; }
+.subtitle { color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.25rem; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+.card h2 { font-size: 1.1rem; margin-bottom: 0.75rem; }
+
+/* Stats grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+}
+.stat {
+  text-align: center;
+  padding: 0.75rem;
+  background: var(--bg);
+  border-radius: 6px;
+}
+.stat.critical { background: var(--critical-bg); }
+.stat-value { display: block; font-size: 2rem; font-weight: 700; }
+.stat-label { font-size: 0.8rem; color: var(--text-secondary); }
+.meta { font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem; text-align: right; }
+
+/* Filters */
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: flex-end;
+  margin-bottom: 0.5rem;
+}
+.filter-group { display: flex; flex-direction: column; min-width: 140px; flex: 1; }
+.filter-group label { font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.2rem; }
+.filter-group select, .filter-group input {
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+.btn {
+  padding: 0.4rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--card);
+  cursor: pointer;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  align-self: flex-end;
+}
+.btn:hover { background: var(--bg); }
+.btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+.btn-primary:hover { background: var(--primary-dark); }
+
+/* Table */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+th, td { padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--border); text-align: left; }
+th { background: var(--bg); font-weight: 600; position: sticky; top: 0; white-space: nowrap; }
+th.num, td.num { text-align: right; }
+tr:hover { background: #f1f8ff; }
+tr.critical-row { background: var(--critical-bg); }
+tr.critical-row:hover { background: #fdd; }
+
+/* Flags */
+.flag-badge {
+  display: inline-block;
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin: 0.1rem;
+  white-space: nowrap;
+}
+.flag-critical { background: var(--danger); color: #fff; }
+.flag-high { background: var(--warning); color: #fff; }
+.flag-normal { background: var(--success); color: #fff; }
+
+/* Grant type badges */
+.grant-badge {
+  display: inline-block;
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+  font-size: 0.7rem;
+  background: #e1ecf4;
+  color: #0366d6;
+  margin: 0.1rem;
+}
+
+/* Clickable rows */
+tbody tr { cursor: pointer; }
+
+/* Modal */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.modal.hidden { display: none; }
+.modal-content {
+  background: var(--card);
+  border-radius: 8px;
+  padding: 2rem;
+  max-width: 900px;
+  width: 95%;
+  max-height: 85vh;
+  overflow-y: auto;
+  position: relative;
+}
+.modal-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 1rem;
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+}
+
+/* Modal detail sections */
+.detail-section { margin-bottom: 1.5rem; }
+.detail-section h3 { font-size: 1rem; border-bottom: 2px solid var(--primary); padding-bottom: 0.3rem; margin-bottom: 0.75rem; }
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+.detail-item { font-size: 0.85rem; }
+.detail-item .label { color: var(--text-secondary); font-size: 0.75rem; }
+.detail-item .value { font-weight: 600; }
+
+.fin-table { width: 100%; font-size: 0.8rem; }
+.fin-table th { font-size: 0.75rem; }
+.fin-table td.positive { color: var(--success); }
+.fin-table td.negative { color: var(--danger); }
+
+footer {
+  text-align: center;
+  padding: 1rem 0;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+footer a { color: var(--primary); }
+
+/* Footnotes */
+.footnote-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 1.25rem;
+}
+.footnote-item {
+  background: var(--bg);
+  border-radius: 6px;
+  padding: 0.9rem 1rem;
+  border-left: 3px solid var(--primary);
+}
+.footnote-item h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  color: var(--text);
+}
+.footnote-item .formula {
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 0.8rem;
+  color: var(--primary);
+  margin-bottom: 0.4rem;
+  font-weight: 600;
+}
+.footnote-item .desc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+.footnote-item .desc strong {
+  color: var(--text);
+}
+.footnote-item .desc code {
+  background: #eee;
+  padding: 0.1rem 0.3rem;
+  border-radius: 2px;
+  font-size: 0.75rem;
+}
+
+.flag-def-table {
+  width: 100%;
+  font-size: 0.75rem;
+  border-collapse: collapse;
+  margin-top: 0.3rem;
+}
+.flag-def-table th {
+  background: #f0f3f6;
+  padding: 0.3rem 0.4rem;
+  text-align: left;
+  font-weight: 600;
+}
+.flag-def-table td {
+  padding: 0.3rem 0.4rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+/* 脚注内フラグバッジはグレー表示 */
+.footnote-item .flag-badge {
+  background: #6c757d;
+  color: #fff;
+}
+
+@media (max-width: 768px) {
+  .filter-row { flex-direction: column; }
+  .filter-group { min-width: 100%; }
+  .detail-grid { grid-template-columns: 1fr; }
+}
